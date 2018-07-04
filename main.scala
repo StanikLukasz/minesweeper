@@ -76,8 +76,8 @@ class Board (width: Int, height: Int, mines: Int){
         if(x > 0 && board(x-1)(y).state == Empty) handleEmpty(x-1,y)
         if(x < height-1 && board(x+1)(y).state == Empty) handleEmpty(x+1,y)
         if(y < width-1 && x > 0 && board(x-1)(y+1).state == Empty) handleEmpty(x-1,y+1)
-        if(y > width-1 && board(x)(y+1).state == Empty) handleEmpty(x,y+1)
-        if(y > width-1 && x < height-1 && board(x+1)(y+1).state == Empty) handleEmpty(x+1,y+1)
+        if(y < width-1 && board(x)(y+1).state == Empty) handleEmpty(x,y+1)
+        if(y < width-1 && x < height-1 && board(x+1)(y+1).state == Empty) handleEmpty(x+1,y+1)
 
         if(x > 0 && y > 0 && board(x-1)(y-1).state == Number) showNumber(x-1,y-1)
         if(y > 0 && board(x)(y-1).state == Number) showNumber(x,y-1)
@@ -85,8 +85,8 @@ class Board (width: Int, height: Int, mines: Int){
         if(x > 0 && board(x-1)(y).state == Number) showNumber(x-1,y)
         if(x < height-1 && board(x+1)(y).state == Number) showNumber(x+1,y)
         if(y < width-1 && x > 0 && board(x-1)(y+1).state == Number) showNumber(x-1,y+1)
-        if(y > width-1 && board(x)(y+1).state == Number) showNumber(x,y+1)
-        if(y > width-1 && x < height-1 && board(x+1)(y+1).state == Number) showNumber(x+1,y+1)
+        if(y < width-1 && board(x)(y+1).state == Number) showNumber(x,y+1)
+        if(y < width-1 && x < height-1 && board(x+1)(y+1).state == Number) showNumber(x+1,y+1)
     }
 
     def showNumber(x: Int, y: Int){
