@@ -12,9 +12,10 @@ import State._
 
 class Field (var state: State = Empty, var value: Int = 0, var hidden: Boolean = true)
 
-class Game (height: Int, width: Int, mines: Int){
+class Board (height: Int, width: Int, mines: Int){
     var board = ofDim[Field](width, height)
-    
+    var lost: Boolean = false
+
     def increaseNeighbour(x: Int, y:Int){
         if(board(x)(y).state == Empty) board(x)(y).state = Number
         board(x)(y).value += 1
@@ -43,7 +44,7 @@ class Game (height: Int, width: Int, mines: Int){
         }
     }
 
-    def checkField(x: Int, y: Int){
+    def checkField(x: Int, y: Int) = {
         if(!board(x)(y).hidden){
             println("Pole juz odsloniete")
 
@@ -55,11 +56,16 @@ class Game (height: Int, width: Int, mines: Int){
         }
     }
 
-    def handleEmpty(x: Int, y:Int){
+    def endGame(){
+        lost = true;
+        for(i <- 0 to width-1; j <- 0 to height-1) board(i)(j).hidden = false
+    }
+
+    def handleEmpty(x: Int, y: Int){
         board(x)(y).hidden = true
 
         if(x > 0 && y > 0 && board(x-1)(y-1).state == Empty) handleEmpty(x-1,y-1)
-        if(y > 0 && board(x)(y-1).state == Empty) handleEmmpty(x,y-1)
+        if(y > 0 && board(x)(y-1).state == Empty) handleEmpty(x,y-1)
         if(y > 0 && x < height-1 && board(x+1)(y-1).state == Empty) handleEmpty(x+1,y-1)
         if(x > 0 && board(x-1)(y).state == Empty) handleEmpty(x-1,y)
         if(x < height-1 && board(x+1)(y).state == Empty) handleEmpty(x+1,y)
@@ -98,7 +104,7 @@ class Game (height: Int, width: Int, mines: Int){
         }
     }
 
-    def checkWin():Boolean = {
+    def checkWin(): Boolean = {
         var won: Boolean = true
         for(i <- 0 to width-1){
             for(j <- 0 to height-1){
@@ -108,6 +114,58 @@ class Game (height: Int, width: Int, mines: Int){
         return won
     }
 
+    def checkLoose(): Boolean = {
+        return lost
+    }
+}
+
+class Game(){
+    println("Podaj wymiary i liczbe min")
+    var input = scala.io.StdIn.readLine()
+    var args = input.split(" ").map(_.toInt)
+    var b: Board = new Board(args(0), args(1), args(2))
+
+    b.prepareBoard()
+    b.printBoard()
+
+    var end: Boolean = false
+    def play(){
+        while(!end){
+            
+            println("Podaj wspolrzedne do odsloniecia")
+            var coorString = scala.io.StdIn.readLine()
+            var coor = coorString.split(" ").map(_.toInt)
+            b.checkField(coor(0), coor(1))
+            b.printBoard()
+            if(b.checkWin()){
+                println("Wygrales")
+                end = true
+            }
+            if(b.checkLoose()){
+                println("Przegrales")
+                end = true  
+            }
+        }
+    }
 
 }
 
+object Menu{
+    def startGame(){
+        var newGame = new Game
+        newGame.play()
+    }
+
+    def main(args: Array[String]){
+        while(true){
+            println("\nWitamy w grze saper")
+            println("1. Rozpocznij nowa gre")
+            println("2. Zakoncz dzialanie")
+            var input: Int = scala.io.StdIn.readInt()
+            input match{
+                case 1 => startGame()
+                case 2 => System.exit(0)
+            }
+        }
+    }
+}
