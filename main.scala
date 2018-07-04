@@ -12,8 +12,8 @@ import State._
 
 class Field (var state: State = Empty, var value: Int = 0, var hidden: Boolean = true)
 
-class Board (height: Int, width: Int, mines: Int){
-    var board = ofDim[Field](width, height)
+class Board (width: Int, height: Int, mines: Int){
+    var board = Array.ofDim[Field](width, height)
     var lost: Boolean = false
 
     def increaseNeighbour(x: Int, y:Int){
@@ -22,25 +22,31 @@ class Board (height: Int, width: Int, mines: Int){
     }
 
     def prepareBoard(){
+
         var r = new Random
         var placeForMine = 0
+        //println(board(0)(0).value+"asdasdsada")
         for (i <- 1 to mines){
             do{
                 placeForMine = r.nextInt(height*width-1)
+                //println(placeForMine)
+                //println("x="+placeForMine/width+" y="+placeForMine%width)
             }
             while(board(placeForMine/width)(placeForMine%width).state!=Empty)
+            //println("Preparing board")
+
             var x = placeForMine/width
             var y = placeForMine%width
+            
             board(x)(y).state = Mine
-
             if(x > 0 && y > 0) increaseNeighbour(x-1,y-1)
             if(y > 0) increaseNeighbour(x,y-1)
             if(y > 0 && x < height-1) increaseNeighbour(x+1,y-1)
             if(x > 0) increaseNeighbour(x-1,y)
             if(x < height-1) increaseNeighbour(x+1,y)
             if(y < width-1 && x > 0) increaseNeighbour(x-1,y+1)
-            if(y > width-1) increaseNeighbour(x,y+1)
-            if(y > width-1 && x < height-1) increaseNeighbour(x+1,y+1)
+            if(y < width-1) increaseNeighbour(x,y+1)
+            if(y < width-1 && x < height-1) increaseNeighbour(x+1,y+1)
         }
     }
 
