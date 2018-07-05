@@ -10,11 +10,17 @@ object State extends Enumeration {
 
 import State._
 
-class Field (var state: State = Empty, var value: Int = 0, var hidden: Boolean = true)
+class Field (var state: State = Empty, var value: Int = 0, var hidden: Boolean = true, var checked: Boolean = false)
 
 class Board (width: Int, height: Int, mines: Int){
     var board = Array.ofDim[Field](width, height)
     var lost: Boolean = false
+
+    {
+        for (i <- 0 until width)
+            for (j <- 0 until height)
+                board(i)(j) = new Field
+    }
 
     def increaseNeighbour(x: Int, y:Int){
         if(board(x)(y).state == Empty) board(x)(y).state = Number
@@ -22,15 +28,14 @@ class Board (width: Int, height: Int, mines: Int){
     }
 
     def prepareBoard(){
-
         var r = new Random
         var placeForMine = 0
-        //println(board(0)(0).value+"asdasdsada")
+        println(board(0)(0).value+"asdasdsada")
         for (i <- 1 to mines){
             do{
                 placeForMine = r.nextInt(height*width-1)
                 //println(placeForMine)
-                //println("x="+placeForMine/width+" y="+placeForMine%width)
+               //println("x="+placeForMine/width+" y="+placeForMine%width)
             }
             while(board(placeForMine/width)(placeForMine%width).state!=Empty)
             //println("Preparing board")
@@ -56,65 +61,76 @@ class Board (width: Int, height: Int, mines: Int){
 
         }
         else board(x)(y).state match {
-            case Empty => handleEmpty(x,y)
-            case Mine => endGame()
-            case Number => showNumber(x,y)
+            case Empty => {
+              handleEmpty(x,y)
+              refreshBoard()
+            }
+            case Mine => handleMine()
+            case Number => handleNumber(x,y)
         }
     }
 
-    def endGame(){
+    def handleMine(){
         lost = true;
         for(i <- 0 to width-1; j <- 0 to height-1) board(i)(j).hidden = false
     }
 
     def handleEmpty(x: Int, y: Int){
-        board(x)(y).hidden = true
+        board(x)(y).hidden = false
+        board(x)(y).checked = true
+        if(x > 0 && y > 0 && board(x-1)(y-1).state == Empty && board(x-1)(y-1).checked == false) handleEmpty(x-1,y-1)
+        if(y > 0 && board(x)(y-1).state == Empty && board(x)(y-1).checked == false) handleEmpty(x,y-1)
+        if(y > 0 && x < height-1 && board(x+1)(y-1).state == Empty && board(x+1)(y-1).checked == false) handleEmpty(x+1,y-1)
+        if(x > 0 && board(x-1)(y).state == Empty && board(x-1)(y).checked == false) handleEmpty(x-1,y)
+        if(x < height-1 && board(x+1)(y).state == Empty && board(x+1)(y).checked == false) handleEmpty(x+1,y)
+        if(y < width-1 && x > 0 && board(x-1)(y+1).state == Empty && board(x-1)(y+1).checked == false) handleEmpty(x-1,y+1)
+        if(y < width-1 && board(x)(y+1).state == Empty && board(x)(y+1).checked == false) handleEmpty(x,y+1)
+        if(y < width-1 && x < height-1 && board(x+1)(y+1).state == Empty && board(x+1)(y+1).checked == false) handleEmpty(x+1,y+1)
 
-        if(x > 0 && y > 0 && board(x-1)(y-1).state == Empty) handleEmpty(x-1,y-1)
-        if(y > 0 && board(x)(y-1).state == Empty) handleEmpty(x,y-1)
-        if(y > 0 && x < height-1 && board(x+1)(y-1).state == Empty) handleEmpty(x+1,y-1)
-        if(x > 0 && board(x-1)(y).state == Empty) handleEmpty(x-1,y)
-        if(x < height-1 && board(x+1)(y).state == Empty) handleEmpty(x+1,y)
-        if(y < width-1 && x > 0 && board(x-1)(y+1).state == Empty) handleEmpty(x-1,y+1)
-        if(y < width-1 && board(x)(y+1).state == Empty) handleEmpty(x,y+1)
-        if(y < width-1 && x < height-1 && board(x+1)(y+1).state == Empty) handleEmpty(x+1,y+1)
-
-        if(x > 0 && y > 0 && board(x-1)(y-1).state == Number) showNumber(x-1,y-1)
-        if(y > 0 && board(x)(y-1).state == Number) showNumber(x,y-1)
-        if(y > 0 && x < height-1 && board(x+1)(y-1).state == Number) showNumber(x+1,y-1)
-        if(x > 0 && board(x-1)(y).state == Number) showNumber(x-1,y)
-        if(x < height-1 && board(x+1)(y).state == Number) showNumber(x+1,y)
-        if(y < width-1 && x > 0 && board(x-1)(y+1).state == Number) showNumber(x-1,y+1)
-        if(y < width-1 && board(x)(y+1).state == Number) showNumber(x,y+1)
-        if(y < width-1 && x < height-1 && board(x+1)(y+1).state == Number) showNumber(x+1,y+1)
+        if(x > 0 && y > 0 && board(x-1)(y-1).state == Number) handleNumber(x-1,y-1)
+        if(y > 0 && board(x)(y-1).state == Number) handleNumber(x,y-1)
+        if(y > 0 && x < height-1 && board(x+1)(y-1).state == Number) handleNumber(x+1,y-1)
+        if(x > 0 && board(x-1)(y).state == Number) handleNumber(x-1,y)
+        if(x < height-1 && board(x+1)(y).state == Number) handleNumber(x+1,y)
+        if(y < width-1 && x > 0 && board(x-1)(y+1).state == Number) handleNumber(x-1,y+1)
+        if(y < width-1 && board(x)(y+1).state == Number) handleNumber(x,y+1)
+        if(y < width-1 && x < height-1 && board(x+1)(y+1).state == Number) handleNumber(x+1,y+1)
     }
 
-    def showNumber(x: Int, y: Int){
-        board(x)(y).hidden = true
+    def refreshBoard(): Unit ={
+      for (i <- 0 until width)
+        for (j <- 0 until height)
+          board(i)(j).checked = false
+    }
+
+    def handleNumber(x: Int, y: Int){
+        board(x)(y).hidden = false
     }
 
     def printBoard(){
-        println("   ")
-        for(i <- 0 to width-1) println("("+i+") ")
-        
-        for(i <- 0 to height-1){
-            println("("+i+") ")
+        print("    ")
+        for(i <- 0 until width) print("("+i+") ")
+        println()
+        for(i <- 0 until height){
+            print("("+i+") ")
             for(j <- 0 to width-1){
-                if(board(j)(i).hidden==true) println("[ ] ")
+                if(board(j)(i).hidden==true) print("[ ] ")
                 else board(j)(i).state match{
-                    case Empty => println("   ")
-                    case Mine => println("O ")
-                    case Number => println(board(j)(i).value+" ")
+                    case Empty => print("    ")
+                    case Mine => print(" X  ")
+                    case Number => print(" "+board(j)(i).value+"  ")
                 }
             }
+            println()
         }
     }
 
     def checkWin(): Boolean = {
         var won: Boolean = true
-        for(i <- 0 to width-1){
-            for(j <- 0 to height-1){
+        for(i <- 0 until width){
+            for(j <- 0 until height){
                 if(board(i)(j).hidden==true && board(i)(j).state != Mine) won = false
+                if(board(i)(j).hidden==false && board(i)(j).state == Mine) won = false
             }
         }
         return won
@@ -141,7 +157,7 @@ class Game(){
             println("Podaj wspolrzedne do odsloniecia")
             var coorString = scala.io.StdIn.readLine()
             var coor = coorString.split(" ").map(_.toInt)
-            b.checkField(coor(0), coor(1))
+            b.checkField(coor(1), coor(0)) //wiersz, kolumna
             b.printBoard()
             if(b.checkWin()){
                 println("Wygrales")
