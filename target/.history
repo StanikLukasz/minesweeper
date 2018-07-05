@@ -1,0 +1,11 @@
+compile
+run
+set ThisBuild / scalaVersion := "2.12.6"
+compile
+run
+compile
+run
+compile
+run
+compile
+run

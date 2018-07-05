@@ -1,0 +1,1 @@
+scalac -classpath C:\Users\Andra\minesweeper-scala\target\scala-2.12\classes -bootclasspath C:\Users\Andra\.sbt\boot\scala-2.12.6\lib\scala-library.jar C:\Users\Andra\minesweeper-scala\Board.scala C:\Users\Andra\minesweeper-scala\Field.scala C:\Users\Andra\minesweeper-scala\Game.scala C:\Users\Andra\minesweeper-scala\main.scala C:\Users\Andra\minesweeper-scala\State.scala
